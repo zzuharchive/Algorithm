@@ -1,53 +1,40 @@
 import java.util.*;
-
-class Word{
-    String word;
-    int num;
-    
-    Word(String word, int num){
-        this.word = word;
-        this.num = num;
-    }
-}
-
 class Solution {
-
     public int solution(String begin, String target, String[] words) {
+        int answer = 0;
         
-        return bfs(begin, target, words);       
-    }
-    
-    public int bfs(String begin, String target, String[] words){
+        boolean[] visited = new boolean[words.length];
+        int[] distance = new int[words.length];
+        Deque<Integer> q = new ArrayDeque<>();
         
-        Queue<Word> queue = new LinkedList<>();
-        Set<String> visited = new HashSet<>();
-        
-        queue.offer(new Word(begin, 0));
-
-        while(!queue.isEmpty()){
-            Word current = queue.poll();
-           
-            if(current.word.equals(target)){
-                return current.num;
-            }
-            
-            for(int i=0; i<words.length; i++){
-                if(checkWord(current.word, words[i])&&!visited.contains(words[i])){
-                    queue.offer(new Word(words[i], current.num+1));
-                    visited.add(words[i]);
-                }
+        for(int i=0; i<words.length; i++){
+            if(charComp(begin, words[i])) {
+                q.offer(i);
+                distance[i] = 1;
             }
         }
+        
+        while(!q.isEmpty()){
+            int cur = q.poll();
+            if(words[cur].equals(target)) return distance[cur];
+            for(int i=0; i<words.length; i++){
+                if(cur == i || visited[i]
+                   || !charComp(words[cur], words[i])) 
+                    continue;
+                visited[i] = true;
+                q.offer(i);
+                distance[i] = distance[cur] + 1;
+            }
+        }
+        
         return 0;
     }
-    
-    public boolean checkWord(String current, String word){
-        int matchNum =0;
-        for(int i=0; i<current.length(); i++){
-            if(current.charAt(i)!=(word.charAt(i))) {
-                matchNum++;
-            }
+    boolean charComp(String target1, String target2){
+        int equalnum = 0;
+        for(int i=0; i<target1.length(); i++){
+            if(target1.charAt(i) == target2.charAt(i))
+                equalnum++;
         }
-        return (matchNum == 1)? true : false;
+        return (equalnum == target1.length() - 1);
     }
 }
