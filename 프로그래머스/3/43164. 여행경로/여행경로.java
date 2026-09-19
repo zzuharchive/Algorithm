@@ -1,47 +1,36 @@
 import java.util.*;
-class Ticket{
-    String from;
-    String to;
-    boolean used;
-    
-    Ticket(String from, String to){
-        this.from = from;
-        this.to = to;
-        this.used = false;
-    }
-}
 class Solution {
-    List<String> answer = new ArrayList<>();
-    List<Ticket> ticketsList = new ArrayList<>();
-    
+    boolean[] used;
+    List<String> city = new ArrayList<>();
     public String[] solution(String[][] tickets) {
+        used = new boolean[tickets.length];
         
-        for(String[] ticket : tickets){
-            ticketsList.add(new Ticket(ticket[0], ticket[1]));
-        }
-        
-        ticketsList.sort((a, b)->{
-            if(a.from.equals(b.from)) return a.to.compareTo(b.to);
-            return a.from.compareTo(b.from);
+        Arrays.sort(tickets,(a, b)->{
+            if(a[0].equals(b[0]))
+                return a[1].compareTo(b[1]);
+            return a[0].compareTo(b[0]);
         });
-        answer.add("ICN");
-        dfs("ICN", 0);
-        return answer.toArray(new String[0]);
+        
+        city.add("ICN");
+        travel("ICN", 0, tickets);
+        
+        return city.toArray(new String[0]);
     }
-    
-    private boolean dfs(String current, int depth){
-        if(depth == ticketsList.size()){
-            return true;
-        }
-        for(int i=0; i<ticketsList.size(); i++){
-            Ticket ticket = ticketsList.get(i);
-            if(!ticket.used && ticket.from.equals(current)){
-                ticket.used = true;
-                answer.add(ticket.to);
-                if(dfs(ticket.to, depth + 1)) return true;
-                answer.remove(answer.size()-1);
-                ticket.used = false;
+    boolean travel(String start, int usedAmt, String[][] tickets){
+        if(usedAmt == tickets.length) return true;
+        for(int i=0; i<tickets.length; i++){
+            if(used[i]
+              || !start.equals(tickets[i][0])) continue;
+            
+            city.add(tickets[i][1]);
+            used[i] = true;
+            
+            if(travel(tickets[i][1], usedAmt + 1, tickets)){
+                return true;
             }
+            
+            city.remove(city.size() - 1);
+            used[i] = false;
         }
         return false;
     }
