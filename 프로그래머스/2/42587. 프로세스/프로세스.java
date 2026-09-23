@@ -1,42 +1,41 @@
 import java.util.*;
-class Process{
-    int priorities;
-    int index;
+class Process implements Comparable<Process>{
+    int loc;
+    int priority;
     
-    Process(int index, int priorities){
-        this.index = index;
-        this.priorities = priorities;
+    Process(int loc, int priority){
+        this.loc = loc;
+        this.priority = priority;
+    }
+    
+    @Override
+    public int compareTo(Process p){
+        return Integer.compare(p.priority, this.priority);
     }
 }
 class Solution {
     public int solution(int[] priorities, int location) {
-        int answer = 0;
-        
-        Queue<Process> queue = new LinkedList<>();
+    
+        PriorityQueue<Process> pq = new PriorityQueue<>();
+        Deque<Integer> q = new ArrayDeque<>();
         
         for(int i=0; i<priorities.length; i++){
-            queue.offer(new Process(i, priorities[i]));
+            q.offer(i);
+            pq.offer(new Process(i, priorities[i]));
         }
         
-        while(true){
-            Process now = queue.poll();
-            int locationCount = queue.size();
-            boolean flag = false;
-            for(int i = 0; i<locationCount; i++){
-                Process next = queue.poll();
-                queue.offer(next);
-                if(next.priorities>now.priorities){
-                    flag = true;
-                }
-            }
-            if(flag){
-                queue.offer(now);
+        int answer = 0;
+        
+        while(!q.isEmpty()){
+            int cur = q.poll();
+            if(pq.peek().priority > priorities[cur]){
+                q.offer(cur); 
             }else{
                 answer++;
-                if(now.index == location){
-                return answer;
-                }   
-            }
+                pq.poll();
+                if(cur == location) break;
+            } 
         }
+        return answer;
     }
 }
